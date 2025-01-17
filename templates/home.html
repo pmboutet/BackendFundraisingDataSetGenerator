@@ -2,7 +2,8 @@
 <html>
 <head>
     <title>Fundraising Dataset Generator API</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <link href="http://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-100">
     <div class="container mx-auto px-4 py-8">
@@ -13,9 +14,9 @@
             <div class="p-6 border-b">
                 <h2 class="text-2xl font-semibold mb-4 text-gray-700">API Documentation</h2>
                 <div class="space-y-2">
-                    <a href="/api/docs/" class="block text-blue-600 hover:text-blue-800">📚 Swagger UI Documentation</a>
-                    <a href="/api/redoc/" class="block text-blue-600 hover:text-blue-800">📖 ReDoc Documentation</a>
-                    <a href="/api/schema/" class="block text-blue-600 hover:text-blue-800">🔍 Raw OpenAPI Schema</a>
+                    <a href="http://127.0.0.1:8000/api/docs/" class="block text-blue-600 hover:text-blue-800">📚 Swagger UI Documentation</a>
+                    <a href="http://127.0.0.1:8000/api/redoc/" class="block text-blue-600 hover:text-blue-800">📖 ReDoc Documentation</a>
+                    <a href="http://127.0.0.1:8000/api/schema/" class="block text-blue-600 hover:text-blue-800">🔍 Raw OpenAPI Schema</a>
                 </div>
             </div>
 
@@ -27,17 +28,17 @@
                         <h3 class="font-medium text-gray-700">🔑 JWT Token</h3>
                         <p class="text-sm text-gray-600 mb-2">Obtain and refresh JWT tokens</p>
                         <ul class="list-disc list-inside text-sm space-y-1 text-gray-600">
-                            <li><code class="bg-gray-100 px-2 py-1 rounded">/auth/jwt/create/</code> - Obtain token</li>
-                            <li><code class="bg-gray-100 px-2 py-1 rounded">/auth/jwt/refresh/</code> - Refresh token</li>
-                            <li><code class="bg-gray-100 px-2 py-1 rounded">/auth/jwt/verify/</code> - Verify token</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">http://127.0.0.1:8000/auth/jwt/create/</code> - Obtain token</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">http://127.0.0.1:8000/auth/jwt/refresh/</code> - Refresh token</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">http://127.0.0.1:8000/auth/jwt/verify/</code> - Verify token</li>
                         </ul>
                     </div>
                     <div>
                         <h3 class="font-medium text-gray-700">👤 User Management</h3>
                         <p class="text-sm text-gray-600 mb-2">User registration and management</p>
                         <ul class="list-disc list-inside text-sm space-y-1 text-gray-600">
-                            <li><code class="bg-gray-100 px-2 py-1 rounded">/auth/users/</code> - Register new user</li>
-                            <li><code class="bg-gray-100 px-2 py-1 rounded">/auth/users/me/</code> - Current user info</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">http://127.0.0.1:8000/auth/users/</code> - Register new user</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">http://127.0.0.1:8000/auth/users/me/</code> - Current user info</li>
                         </ul>
                     </div>
                 </div>
@@ -51,7 +52,7 @@
                         <h3 class="font-medium text-gray-700">📊 Dataset Generation</h3>
                         <p class="text-sm text-gray-600 mb-2">Generate synthetic fundraising data</p>
                         <ul class="list-disc list-inside text-sm space-y-1 text-gray-600">
-                            <li><code class="bg-gray-100 px-2 py-1 rounded">/api/generate/</code> - Generate dataset</li>
+                            <li><code class="bg-gray-100 px-2 py-1 rounded">http://127.0.0.1:8000/api/generate/</code> - Generate dataset</li>
                         </ul>
                     </div>
                 </div>
