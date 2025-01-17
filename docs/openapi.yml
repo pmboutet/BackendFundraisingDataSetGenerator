@@ -1,0 +1,173 @@
+openapi: 3.0.3
+info:
+  title: Fundraising Dataset Generator API
+  description: |
+    API for generating synthetic fundraising datasets based on YAML configurations.
+    
+    ## Overview
+    This API allows you to generate realistic fundraising data for testing and development purposes.
+    The data generated includes:
+    * Donor transactions
+    * Donor profiles
+    * Campaign information
+    * Channel-specific metrics
+    
+    ## Authentication
+    The API uses JWT (JSON Web Token) authentication. You need to:
+    1. Register a user account
+    2. Obtain a JWT token
+    3. Include the token in your requests
+    
+    ## Configuration
+    The data generation is controlled by a YAML configuration file that specifies:
+    * Number of years to generate
+    * Initial donor database size
+    * Channel configurations
+    * Campaign parameters
+    * Demographic settings
+  version: 1.0.0
+  contact:
+    name: API Support
+    
+paths:
+  /api/generate/:
+    post:
+      summary: Generate Fundraising Dataset
+      description: |
+        Generates a synthetic fundraising dataset based on the provided YAML configuration.
+        
+        The generated data includes:
+        * Donor transactions with detailed campaign information
+        * Donor profiles with demographic data
+        * Campaign performance metrics
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                config_file:
+                  type: string
+                  format: binary
+                  description: YAML configuration file
+      responses:
+        '200':
+          description: Successfully generated dataset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeneratedDataset'
+        '400':
+          description: Invalid configuration file
+        '401':
+          description: Authentication required
+  
+  /auth/jwt/create/:
+    post:
+      summary: Obtain JWT Token
+      description: Get access and refresh tokens by providing username and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Token pair obtained successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access:
+                    type: string
+                  refresh:
+                    type: string
+
+components:
+  schemas:
+    GeneratedDataset:
+      type: object
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+    
+    Transaction:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date-time
+        campaign_start:
+          type: string
+          format: date-time
+        campaign_end:
+          type: string
+          format: date-time
+        channel:
+          type: string
+        campaign_name:
+          type: string
+        campaign_type:
+          type: string
+          enum: [prospecting, retention]
+        donation_amount:
+          type: number
+          format: float
+        payment_method:
+          type: string
+        cost:
+          type: number
+          format: float
+        reactivity:
+          type: number
+          format: float
+        contact_id:
+          type: string
+    
+    Contact:
+      type: object
+      properties:
+        contact_id:
+          type: string
+        salutation:
+          type: string
+        gender:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        phone:
+          type: string
+        address_1:
+          type: string
+        address_2:
+          type: string
+        zip_code:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        job:
+          type: string
+        origin_decile:
+          type: integer
+        Creation_date:
+          type: string
+          format: date-time
