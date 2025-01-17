@@ -14,9 +14,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'your-default-secret-key-for-dev')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() == 'true'
+DEBUG = os.getenv('DJANGO_DEBUG', 'True').lower() == 'true'
 
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
@@ -51,7 +51,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # Add templates directory
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -168,3 +168,8 @@ if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+else:
+    # Development settings
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
