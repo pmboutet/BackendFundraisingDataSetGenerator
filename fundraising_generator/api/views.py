@@ -6,6 +6,58 @@ import yaml
 from .serializers import ConfigurationSerializer, DatasetResponseSerializer
 from ..services.generator import FundraisingDataGenerator
 
+YAML_EXAMPLE = '''# Basic Configuration
+YEARS: 11
+FIRST_YEAR: 2014
+INITIAL_DONOR_DATABASE_SIZE: 10000
+GLOBAL_CHURN_RATE: 0.99
+LOCALISATION: 'en_GB'
+GDPR_PROOF: True
+
+# Channel Example: Email
+CHANNELS:
+  Email:
+    distribution: "exponential"
+    duration: 5
+    initial_nb: 10000
+    campaigns:
+      prospecting:
+        nb: 3
+        max_reach_contact: 50000
+        transformation_rate: 0.005
+        avg_donation: 20
+        std_deviation: 15
+      retention:
+        nb: 12
+        transformation_rate: 0.02
+        avg_donation: 30
+        std_deviation: 10
+        cross_sell:
+          - ['Email', 100]
+          - ['Print', 40]
+    target:
+      ses_wealth_decile: [1, 8]
+    payment:
+      Credit/Debit Card: 65
+      PayPal: 10
+      Mobile Payment App: 10
+      Direct Debit: 10
+      Cheque: 3
+      Bank Transfer: 1
+    cost_per_reach: 0.05
+
+# Campaign Themes
+CAMPAIGN_THEMES:
+  - ["Forest protection", 0.1]
+  - ["Carbon emission reduction", 0.15]
+  - ["Energy transition", 0.1]
+
+# Target Demographics
+WHO_POSSIBILITIES:
+  - ["Youth", 0.25]
+  - ["Families", 0.2]
+  - ["Businesses", 0.15]'''
+
 class GenerateDatasetView(APIView):
     @extend_schema(
         summary='Generate Fundraising Dataset',
@@ -18,12 +70,24 @@ class GenerateDatasetView(APIView):
         - Channel configurations
         - Campaign themes
         - Demographic settings
-        - And other parameters as specified in the example configuration
-        ''',
+        - And other parameters
+        
+        Example YAML Configuration:
+        ```yaml
+        {}```
+        '''.format(YAML_EXAMPLE),
         request=ConfigurationSerializer,
         responses={200: DatasetResponseSerializer},
         methods=['POST'],
         examples=[
+            OpenApiExample(
+                'Example Configuration',
+                summary='Basic YAML configuration',
+                description='Example of a minimal YAML configuration file',
+                value={'config_file': YAML_EXAMPLE},
+                request_only=True,
+                response_only=False,
+            ),
             OpenApiExample(
                 'Successful Response',
                 value={
