@@ -6,6 +6,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('fundraising_generator.urls')),
     
+    # Authentication URLs
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
+    
     # OpenAPI documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
