@@ -1,0 +1,32 @@
+# macOS system files
+.DS_Store
+
+# IDE files
+.codegenie/
+.idea/
+.vscode/
+
+# Environment files
+.env
+venv/
+*.pyc
+__pycache__/
+
+# Local configuration
+Config_FundraisingGenerator.yml
+
+# Database
+db.sqlite3
+
+# Python cache directories
+api/__pycache__/
+config/__pycache__/
+fundraising_generator/__pycache__/
+fundraising_generator/api/__pycache__/
+fundraising_generator/services/__pycache__/
+
+# Logs
+*.log
+
+# Static files
+staticfiles/
