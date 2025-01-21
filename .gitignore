@@ -1,54 +1,19 @@
-# macOS system files
-.DS_Store
+# Environment
+venv/
+.env
 
-# IDE files
-.codegenie/
+# Python
+__pycache__/
+*.pyc
+
+# Project specific
+lib/
+Config_FundraisingGenerator.yml
+db.sqlite3
+
+# IDE
 .idea/
 .vscode/
 
-# Environment files
-.env
-venv/
-.venv/
-env/
-.env/
-*.pyc
-__pycache__/
-
-# Python libraries and dependencies
-lib/
-lib64/
-bin/
-include/
-share/
-*.so
-*.dylib
-*.dll
-
-# Local configuration
-Config_FundraisingGenerator.yml
-
-# Database
-db.sqlite3
-
-# Python cache directories
-api/__pycache__/
-config/__pycache__/
-fundraising_generator/__pycache__/
-fundraising_generator/api/__pycache__/
-fundraising_generator/services/__pycache__/
-
 # Logs
 *.log
-
-# Static files
-staticfiles/
-
-# Distribution / packaging
-*.egg-info/
-dist/
-build/
-pip-log.txt
-pip-delete-this-directory.txt
-.Python
-wheels/
