@@ -5,6 +5,7 @@ import random
 import string
 from faker import Faker
 from scipy.spatial import KDTree
+from .contact_manager import ContactManager
 
 class FundraisingDataGenerator:
     def __init__(self, config):
