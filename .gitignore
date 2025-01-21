@@ -9,6 +9,9 @@
 # Environment files
 .env
 venv/
+.venv/
+env/
+.env/
 *.pyc
 __pycache__/
 
@@ -30,3 +33,8 @@ fundraising_generator/services/__pycache__/
 
 # Static files
 staticfiles/
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
