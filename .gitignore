@@ -21,6 +21,9 @@ lib64/
 bin/
 include/
 share/
+*.so
+*.dylib
+*.dll
 
 # Local configuration
 Config_FundraisingGenerator.yml
@@ -47,3 +50,5 @@ dist/
 build/
 pip-log.txt
 pip-delete-this-directory.txt
+.Python
+wheels/
