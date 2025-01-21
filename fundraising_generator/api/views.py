@@ -5,6 +5,11 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExampl
 import yaml
 from .serializers import ConfigurationSerializer, DatasetResponseSerializer
 from ..services.generator import FundraisingDataGenerator
+from django.http import HttpResponse
+import io
+import zipfile
+import pandas as pd
+from datetime import datetime
 
 class GenerateDatasetView(APIView):
     @extend_schema(
@@ -26,7 +31,13 @@ class GenerateDatasetView(APIView):
         ''',
         request=ConfigurationSerializer,
         responses={
-            200: DatasetResponseSerializer,
+            200: OpenApiExample(
+                'File Response',
+                value={
+                    'content': 'binary file content (ZIP)',
+                    'content-type': 'application/zip'
+                }
+            ),
             400: OpenApiExample(
                 'Validation Error',
                 value={
@@ -45,7 +56,7 @@ class GenerateDatasetView(APIView):
         tags=['Dataset Generation']
     )
     def post(self, request):
-        """Generate fundraising dataset based on YAML configuration."""
+        """Generate fundraising dataset and return as ZIP file."""
         serializer = ConfigurationSerializer(data=request.data)
         
         if not serializer.is_valid():
@@ -63,13 +74,32 @@ class GenerateDatasetView(APIView):
             generator = FundraisingDataGenerator(config_data)
             transactions, contacts = generator.generate()
 
-            # Convert DataFrames to JSON-serializable format
-            response_data = {
-                'transactions': transactions.to_dict('records'),
-                'contacts': contacts.to_dict('records')
-            }
+            # Create ZIP file in memory
+            zip_buffer = io.BytesIO()
+            
+            with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                # Convert DataFrames to CSV and add to ZIP
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                
+                # Add transactions CSV
+                transactions_csv = transactions.to_csv(index=False).encode('utf-8')
+                zip_file.writestr(f'transactions_{timestamp}.csv', transactions_csv)
+                
+                # Add contacts CSV
+                contacts_csv = contacts.to_csv(index=False).encode('utf-8')
+                zip_file.writestr(f'contacts_{timestamp}.csv', contacts_csv)
 
-            return Response(response_data, status=status.HTTP_200_OK)
+            # Prepare the response
+            zip_buffer.seek(0)
+            response = HttpResponse(
+                zip_buffer.getvalue(),
+                content_type='application/zip'
+            )
+            
+            # Set filename for download
+            response['Content-Disposition'] = f'attachment; filename=fundraising_data_{timestamp}.zip'
+            
+            return response
 
         except yaml.YAMLError as e:
             return Response(
