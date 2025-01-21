@@ -1,12 +1,14 @@
 from .base import *
+import dj_database_url
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['test-app.herokuapp.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-# Test database configuration
+# Database configuration
 DATABASES = {
     'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',
         conn_max_age=600,
         conn_health_checks=True,
     )
@@ -14,39 +16,7 @@ DATABASES = {
 
 # CORS settings for test environment
 CORS_ALLOWED_ORIGINS = [
-    'https://test-frontend-domain.com',
     'http://localhost:3000',
+    'http://127.0.0.1:3000',
 ]
 CORS_ALLOW_CREDENTIALS = True
-
-# Less strict security settings for test environment
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-
-# More verbose logging for testing
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'django.db.backends': {
-            'level': 'INFO',
-            'handlers': ['console'],
-            'propagate': False,
-        },
-    },
-}
