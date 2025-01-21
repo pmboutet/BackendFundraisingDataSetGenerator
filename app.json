@@ -1,0 +1,40 @@
+{
+  "name": "fundraising-dataset-generator",
+  "description": "Backend service for generating fundraising datasets",
+  "repository": "https://github.com/pmboutet/BackendFundraisingDataSetGenerator",
+  "keywords": ["python", "django", "api"],
+  "env": {
+    "DJANGO_SETTINGS_MODULE": {
+      "description": "Django settings module",
+      "value": "config.settings.production"
+    },
+    "DJANGO_SECRET_KEY": {
+      "description": "A secret key for verifying the integrity of signed cookies",
+      "generator": "secret"
+    },
+    "DJANGO_SUPERUSER_USERNAME": {
+      "description": "Initial superuser username",
+      "required": true
+    },
+    "DJANGO_SUPERUSER_EMAIL": {
+      "description": "Initial superuser email",
+      "required": true
+    },
+    "DJANGO_SUPERUSER_PASSWORD": {
+      "description": "Initial superuser password",
+      "required": true
+    }
+  },
+  "addons": [
+    "heroku-postgresql:hobby-dev"
+  ],
+  "scripts": {
+    "postdeploy": "python manage.py migrate && python manage.py createsuperuser --noinput"
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "eco"
+    }
+  }
+}
