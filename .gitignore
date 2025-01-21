@@ -15,6 +15,13 @@ env/
 *.pyc
 __pycache__/
 
+# Python libraries and dependencies
+lib/
+lib64/
+bin/
+include/
+share/
+
 # Local configuration
 Config_FundraisingGenerator.yml
 
@@ -38,3 +45,5 @@ staticfiles/
 *.egg-info/
 dist/
 build/
+pip-log.txt
+pip-delete-this-directory.txt
