@@ -35,6 +35,7 @@ python manage.py runserver
 - [Configuration Guide](docs/configuration.md) - YAML configuration reference
 - [Examples](docs/examples.md) - Sample configurations and API usage
 - [OpenAPI Specification](docs/openapi.yml) - Full API specification
+- [Data Downloads](docs/data_downloads.md) - Information about downloading generated datasets
 
 ## Features
 
@@ -44,6 +45,7 @@ python manage.py runserver
 - Configurable campaign parameters
 - Cross-channel donor relationships
 - Time-based data distribution patterns
+- Automated ZIP file downloads containing CSV data
 
 ### Customization Options
 - Channel-specific settings
@@ -57,7 +59,8 @@ python manage.py runserver
 - JWT authentication
 - Detailed API documentation
 - File upload support
-- Comprehensive response data
+- Automated data download in ZIP format
+- Browser-friendly downloads
 
 ## API Endpoints
 
@@ -67,7 +70,7 @@ python manage.py runserver
 - `POST /auth/users/` - Register new user
 
 ### Data Generation
-- `POST /api/generate/` - Generate fundraising dataset
+- `POST /api/generate/` - Generate and download fundraising dataset
 
 ## Configuration Example
 
@@ -99,14 +102,19 @@ CHANNELS:
 ```bash
 curl -X POST http://localhost:8000/auth/jwt/create/ \
      -H 'Content-Type: application/json' \
-     -d '{"username": "your_username", "password": "your_password"}'```
+     -d '{"username": "your_username", "password": "your_password"}'
+```
 
-2. Generate dataset:
+2. Generate and download dataset:
 ```bash
+# Download ZIP file
 curl -X POST http://localhost:8000/api/generate/ \
      -H 'Authorization: Bearer your_jwt_token' \
-     -F 'config_file=@your_config.yml'
+     -F 'config_file=@your_config.yml' \
+     --output fundraising_data.zip
 ```
+
+When using a web browser, the ZIP file will be automatically downloaded.
 
 ## Development
 
