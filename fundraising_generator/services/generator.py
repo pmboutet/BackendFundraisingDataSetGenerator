@@ -181,7 +181,7 @@ class FundraisingDataGenerator:
                 'last_name': self.fake.last_name(),
                 'phone': self.fake.phone_number(),
                 'address_1': self.fake.street_address(),
-                'address_2': self.fake.secondary_address() if random.random() > 0.5 else '',
+                'address_2': self.fake.building_number() if random.random() > 0.5 else '',
                 'zip_code': self.fake.postcode(),
                 'city': self.fake.city(),
                 'country': self.fake.country(),

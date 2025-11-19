@@ -81,13 +81,25 @@ class GenerateDatasetView(APIView):
                 # Convert DataFrames to CSV and add to ZIP
                 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
                 
-                # Add transactions CSV
-                transactions_csv = transactions.to_csv(index=False).encode('utf-8')
-                zip_file.writestr(f'transactions_{timestamp}.csv', transactions_csv)
+                # Import Salesforce mapper
+                from ..services.salesforce_mapper import export_to_salesforce_format
                 
-                # Add contacts CSV
-                contacts_csv = contacts.to_csv(index=False).encode('utf-8')
-                zip_file.writestr(f'contacts_{timestamp}.csv', contacts_csv)
+                # Add transactions CSV (Salesforce NPC format)
+                transactions_sf = export_to_salesforce_format(transactions, data_type='transactions')
+                transactions_csv = transactions_sf.to_csv(index=False).encode('utf-8')
+                zip_file.writestr(f'Gift_Transaction_{timestamp}.csv', transactions_csv)
+                
+                # Add contacts CSV (Salesforce NPC format)
+                contacts_sf = export_to_salesforce_format(contacts, data_type='contacts')
+                contacts_csv = contacts_sf.to_csv(index=False).encode('utf-8')
+                zip_file.writestr(f'Contact_{timestamp}.csv', contacts_csv)
+                
+                # Also include original format files for backward compatibility
+                transactions_csv_orig = transactions.to_csv(index=False).encode('utf-8')
+                zip_file.writestr(f'transactions_{timestamp}.csv', transactions_csv_orig)
+                
+                contacts_csv_orig = contacts.to_csv(index=False).encode('utf-8')
+                zip_file.writestr(f'contacts_{timestamp}.csv', contacts_csv_orig)
 
             # Prepare the response
             zip_buffer.seek(0)

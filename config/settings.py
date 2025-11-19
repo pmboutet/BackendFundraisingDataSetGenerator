@@ -9,12 +9,12 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY') or os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
     if os.environ.get('DEBUG', 'False').lower() == 'true':
         SECRET_KEY = 'django-insecure-development-key'
     else:
-        raise ValueError('No SECRET_KEY set in environment')
+        raise ValueError('No SECRET_KEY or DJANGO_SECRET_KEY set in environment')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
@@ -36,7 +36,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework_simplejwt',
+    'djoser',
     'api',
+    'fundraising_generator',
 ]
 
 MIDDLEWARE = [

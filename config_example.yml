@@ -1,0 +1,110 @@
+# Configuration Example for Fundraising Dataset Generator
+# This file can be used as a template for generating fundraising datasets
+
+# Basic settings
+YEARS: 5
+FIRST_YEAR: 2020
+INITIAL_DONOR_DATABASE_SIZE: 10000
+GLOBAL_CHURN_RATE: 0.99
+LOCALISATION: 'en_GB'
+GDPR_PROOF: True
+
+# Channel configuration
+CHANNELS:
+  Email:
+    distribution: "exponential"
+    duration: 5
+    initial_nb: 10000
+    cost_per_reach: 0.5
+    payment:
+      "Credit Card": 0.6
+      "Bank Transfer": 0.3
+      "PayPal": 0.1
+    campaigns:
+      prospecting:
+        nb: 3
+        max_reach_contact: 50000
+        transformation_rate: 0.005
+        avg_donation: 20
+        std_deviation: 15
+      retention:
+        nb: 2
+        max_reach_contact: 10000
+        transformation_rate: 0.02
+        avg_donation: 50
+        std_deviation: 25
+        cross_sell:
+          - ["Email", 0.3]
+  
+  DirectMail:
+    distribution: "regular"
+    duration: 30
+    initial_nb: 5000
+    cost_per_reach: 2.0
+    payment:
+      "Check": 0.5
+      "Credit Card": 0.4
+      "Bank Transfer": 0.1
+    campaigns:
+      prospecting:
+        nb: 2
+        max_reach_contact: 20000
+        transformation_rate: 0.01
+        avg_donation: 35
+        std_deviation: 20
+      retention:
+        nb: 1
+        max_reach_contact: 5000
+        transformation_rate: 0.03
+        avg_donation: 75
+        std_deviation: 30
+        cross_sell:
+          - ["Email", 0.2]
+          - ["DirectMail", 0.1]
+
+# Campaign themes with probabilities
+CAMPAIGN_THEMES:
+  - ["Climate_awareness", 0.3]
+  - ["Education", 0.25]
+  - ["Healthcare", 0.2]
+  - ["Poverty_alleviation", 0.15]
+  - ["Animal_welfare", 0.1]
+
+# Demographic settings
+SALUTATIONS:
+  - civility: "Mr."
+    gender: "male"
+    probability: 0.4
+  - civility: "Mrs."
+    gender: "female"
+    probability: 0.35
+  - civility: "Ms."
+    gender: "female"
+    probability: 0.15
+  - civility: "Dr."
+    gender: "other"
+    probability: 0.1
+
+# Job categories
+WEALTHY_JOB:
+  - "CEO"
+  - "Director"
+  - "Surgeon"
+  - "Lawyer"
+  - "Investment Banker"
+  - "Consultant"
+  - "Engineer"
+  - "Architect"
+
+NON_WEALTHY_JOB:
+  - "Teacher"
+  - "Nurse"
+  - "Administrator"
+  - "Retail Worker"
+  - "Student"
+  - "Retired"
+  - "Freelancer"
+  - "Artist"
+
+
+

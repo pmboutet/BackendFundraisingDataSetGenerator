@@ -1,0 +1,286 @@
+# Demo Configuration - Redd Barna: Complex Correlation Analysis
+# This configuration generates data showing that the combination of:
+# - High wealth (deciles 8-10)
+# - Digital channel usage (Online, Email, MonthlyGiving)
+# - Long-term donors (early Creation_date)
+# Creates a strong correlation with becoming a regular donor
+#
+# Based on Redd Barna (Save the Children Norway) fundraising context:
+# - International NGO mobilizing general public + corporate partners
+# - Norwegian market with higher donation amounts (~150-250€ average, ~20-40€ monthly)
+# - Retention rates: 45-55% for regular donors, 15-25% for new donors
+
+# Basic settings
+YEARS: 5
+FIRST_YEAR: 2020
+INITIAL_DONOR_DATABASE_SIZE: 25000
+GLOBAL_CHURN_RATE: 0.99
+LOCALISATION: 'en_US'
+GDPR_PROOF: True
+
+# Channel configuration
+CHANNELS:
+  # Online donations (website, web forms) - Primary digital channel
+  # Wealthy donors prefer this channel for convenience and higher amounts
+  Online:
+    distribution: "exponential"
+    duration: 14
+    initial_nb: 18000  # Large initial base to create long-term digital donors
+    cost_per_reach: 0.4
+    payment:
+      "Credit Card": 0.65
+      "Bank Transfer": 0.25
+      "PayPal": 0.10
+    campaigns:
+      # Prospecting campaigns - attract all types of donors
+      prospecting:
+        nb: 8  # Multiple online campaigns throughout the year
+        max_reach_contact: 120000
+        transformation_rate: 0.012  # Higher conversion online
+        avg_donation: 200  # Higher average for Norwegian market (€150-250)
+        std_deviation: 80
+      # Retention campaigns - target existing donors
+      # These will create regular donors, especially from early years
+      retention:
+        nb: 20  # Many retention campaigns to create regular donors over time
+        max_reach_contact: 50000
+        transformation_rate: 0.35  # High conversion rate for retention
+        avg_donation: 250  # Higher amounts for regular donors
+        std_deviation: 100
+        cross_sell:
+          - ["Online", 0.60]  # 60% of existing Online contacts are targeted
+          - ["Email", 0.40]   # Cross-sell from Email channel
+          - ["MonthlyGiving", 0.25]  # Upgrade monthly donors
+  
+  # Email campaigns / newsletters - Digital channel for engagement
+  # Strong correlation with wealthy, long-term donors
+  Email:
+    distribution: "exponential"
+    duration: 7
+    initial_nb: 22000  # Large initial base to create long-term donors
+    cost_per_reach: 0.3
+    payment:
+      "Credit Card": 0.70
+      "Bank Transfer": 0.20
+      "PayPal": 0.10
+    campaigns:
+      prospecting:
+        nb: 12  # Regular newsletters and campaigns
+        max_reach_contact: 150000
+        transformation_rate: 0.010
+        avg_donation: 180  # Good conversion from email
+        std_deviation: 70
+      retention:
+        nb: 24  # Monthly newsletters + special campaigns
+        max_reach_contact: 60000
+        transformation_rate: 0.30  # High conversion rate for retention
+        avg_donation: 220  # Higher amounts for regular donors
+        std_deviation: 90
+        cross_sell:
+          - ["Email", 0.70]  # 70% of existing Email contacts are targeted
+          - ["Online", 0.50]  # Cross-sell to Online channel
+          - ["MonthlyGiving", 0.30]  # Convert to monthly giving
+  
+  # Monthly giving / recurring donations - Strong indicator of regular donors
+  # Wealthy donors are more likely to commit to monthly giving
+  MonthlyGiving:
+    distribution: "regular"
+    duration: 365  # Year-long commitment
+    initial_nb: 8000  # Initial monthly donors
+    cost_per_reach: 0.5
+    payment:
+      "Bank Transfer": 0.60  # Direct debit preferred for monthly
+      "Credit Card": 0.35
+      "PayPal": 0.05
+    campaigns:
+      prospecting:
+        nb: 6  # Campaigns to recruit new monthly donors
+        max_reach_contact: 80000
+        transformation_rate: 0.008  # Lower conversion but high value
+        avg_donation: 30  # Monthly amount (€20-40 range)
+        std_deviation: 12
+      retention:
+        nb: 18  # Regular campaigns to retain monthly donors
+        max_reach_contact: 35000
+        transformation_rate: 0.50  # Very high retention for monthly donors
+        avg_donation: 35  # Slightly higher for retained monthly donors
+        std_deviation: 15
+        cross_sell:
+          - ["MonthlyGiving", 0.80]  # Strong retention focus
+          - ["Online", 0.40]  # Cross-sell from Online
+          - ["Email", 0.50]   # Cross-sell from Email
+  
+  # Corporate events / CSR partnerships - Target wealthy donors
+  CorporateEvents:
+    distribution: "regular"
+    duration: 60
+    initial_nb: 3000  # Corporate contacts
+    cost_per_reach: 5.0  # Higher cost for events
+    payment:
+      "Bank Transfer": 0.50
+      "Credit Card": 0.40
+      "Check": 0.10
+    campaigns:
+      prospecting:
+        nb: 4  # Corporate partnership events
+        max_reach_contact: 12000
+        transformation_rate: 0.015  # Higher conversion at events
+        avg_donation: 500  # Corporate donations are higher
+        std_deviation: 300
+      retention:
+        nb: 8  # Regular corporate events
+        max_reach_contact: 8000
+        transformation_rate: 0.40  # High retention for corporate donors
+        avg_donation: 600  # Higher amounts for retained corporate donors
+        std_deviation: 350
+        cross_sell:
+          - ["CorporateEvents", 0.50]
+          - ["Online", 0.30]
+          - ["Email", 0.25]
+  
+  # Direct mail (Norway) - Traditional channel
+  DirectMail:
+    distribution: "regular"
+    duration: 30
+    initial_nb: 6000
+    cost_per_reach: 3.0  # Higher cost for Norway
+    payment:
+      "Check": 0.50
+      "Bank Transfer": 0.35
+      "Credit Card": 0.15
+    campaigns:
+      prospecting:
+        nb: 4
+        max_reach_contact: 20000
+        transformation_rate: 0.010
+        avg_donation: 150  # Lower than digital but still good
+        std_deviation: 60
+      retention:
+        nb: 10
+        max_reach_contact: 12000
+        transformation_rate: 0.25
+        avg_donation: 200
+        std_deviation: 80
+        cross_sell:
+          - ["DirectMail", 0.30]
+          - ["Email", 0.25]
+          - ["Online", 0.20]
+  
+  # Emergency campaigns / Crowdfunding - Urgent appeals
+  Emergency:
+    distribution: "exponential"  # Rapid response needed
+    duration: 21
+    initial_nb: 5000
+    cost_per_reach: 0.6
+    payment:
+      "Credit Card": 0.75  # Fast payment preferred
+      "Bank Transfer": 0.20
+      "PayPal": 0.05
+    campaigns:
+      prospecting:
+        nb: 6  # Emergency appeals throughout the year
+        max_reach_contact: 100000
+        transformation_rate: 0.015  # Higher urgency conversion
+        avg_donation: 180
+        std_deviation: 90
+      retention:
+        nb: 8  # Follow-up emergency campaigns
+        max_reach_contact: 40000
+        transformation_rate: 0.28
+        avg_donation: 220
+        std_deviation: 100
+        cross_sell:
+          - ["Emergency", 0.50]
+          - ["Email", 0.45]
+          - ["Online", 0.40]
+  
+  # Media campaigns / Mass collections - Norwegian media partnerships
+  MediaCampaigns:
+    distribution: "regular"
+    duration: 45
+    initial_nb: 4000
+    cost_per_reach: 2.0
+    payment:
+      "Credit Card": 0.60
+      "Bank Transfer": 0.30
+      "Check": 0.10
+    campaigns:
+      prospecting:
+        nb: 5  # Media partnership campaigns
+        max_reach_contact: 80000
+        transformation_rate: 0.012
+        avg_donation: 160
+        std_deviation: 70
+      retention:
+        nb: 6  # Follow-up media campaigns
+        max_reach_contact: 25000
+        transformation_rate: 0.22
+        avg_donation: 190
+        std_deviation: 85
+        cross_sell:
+          - ["MediaCampaigns", 0.35]
+          - ["Email", 0.40]
+          - ["Online", 0.35]
+
+# Campaign themes - Based on Redd Barna's focus areas
+CAMPAIGN_THEMES:
+  - ["Children_education", 0.25]  # "Children learn & are safe"
+  - ["Children_protection", 0.25]  # "Children's rights are implemented"
+  - ["Emergency_relief", 0.20]  # Emergency humanitarian campaigns
+  - ["Child_healthcare", 0.15]  # Health and nutrition programs
+  - ["Child_safety", 0.10]  # Protection from violence and exploitation
+  - ["Education_access", 0.05]  # Access to quality education
+
+# Demographic settings
+SALUTATIONS:
+  - civility: "Mr."
+    gender: "male"
+    probability: 0.45
+  - civility: "Mrs."
+    gender: "female"
+    probability: 0.35
+  - civility: "Ms."
+    gender: "female"
+    probability: 0.15
+  - civility: "Dr."
+    gender: "other"
+    probability: 0.05
+
+# Wealthy jobs - these people will make larger donations (deciles 8-10)
+# and will be more likely to be targeted by retention campaigns
+# Norwegian context: high-income professions
+WEALTHY_JOB:
+  - "CEO"
+  - "Director"
+  - "Surgeon"
+  - "Lawyer"
+  - "Investment Banker"
+  - "Consultant"
+  - "Senior Engineer"
+  - "Architect"
+  - "Specialist Doctor"
+  - "Executive"
+  - "IT Director"
+  - "Financial Advisor"
+  - "Marketing Director"
+  - "Operations Manager"
+  - "Research Director"
+
+# Non-wealthy jobs - these people will generally make smaller donations
+NON_WEALTHY_JOB:
+  - "Teacher"
+  - "Nurse"
+  - "Administrator"
+  - "Retail Worker"
+  - "Student"
+  - "Retired"
+  - "Freelancer"
+  - "Artist"
+  - "Office Worker"
+  - "Technician"
+  - "Social Worker"
+  - "Caregiver"
+  - "Receptionist"
+  - "Cashier"
+  - "Cleaner"
+
