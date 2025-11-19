@@ -93,3 +93,16 @@ docker-compose.override.yml
 swagger.json
 swagger.yaml
 api-docs/
+
+# Demo files
+demo_*.py
+demo_*.yml
+demo_*.zip
+demo_output/
+DEMO_README*.md
+run_demo*.sh
+generate_demo_data*.py
+
+# Old/unnecessary files
+config/settings_old.py
+staticfiles/
