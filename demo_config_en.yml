@@ -1,7 +1,7 @@
 # Demo Configuration - Redd Barna: Complex Correlation Analysis
 # This configuration generates data showing that the combination of:
 # - High wealth (deciles 8-10)
-# - Digital channel usage (Online, Email, MonthlyGiving)
+# - Digital channel usage (Online, Email)
 # - Long-term donors (early Creation_date)
 # Creates a strong correlation with becoming a regular donor
 #
@@ -18,6 +18,11 @@ GLOBAL_CHURN_RATE: 0.99
 LOCALISATION: 'en_US'
 GDPR_PROOF: True
 
+# Regular donor settings
+# Regular donors are attached to their original campaign channel
+# They make monthly donations starting the month after their first donation
+GLOBAL_REGULAR_DONOR_RATE: 0.15  # Base rate for becoming a regular donor (target: ~15% overall)
+
 # Channel configuration
 CHANNELS:
   # Online donations (website, web forms) - Primary digital channel
@@ -31,6 +36,13 @@ CHANNELS:
       "Credit Card": 0.65
       "Bank Transfer": 0.25
       "PayPal": 0.10
+    # Regular donor configuration
+    regular_donor_rate: 1.2  # Channel-specific rate (multiplied by global rate)
+    regular_donor_monthly_avg: 30  # Average monthly donation amount for regular donors
+    regular_donor_wealth_multiplier:
+      low: 0.6      # Low wealth (deciles 1-4)
+      medium: 1.2   # Medium wealth (deciles 5-7)
+      high: 2.8     # High wealth (deciles 8-10)
     campaigns:
       # Prospecting campaigns - attract all types of donors
       prospecting:
@@ -50,7 +62,6 @@ CHANNELS:
         cross_sell:
           - ["Online", 0.60]  # 60% of existing Online contacts are targeted
           - ["Email", 0.40]   # Cross-sell from Email channel
-          - ["MonthlyGiving", 0.25]  # Upgrade monthly donors
   
   # Email campaigns / newsletters - Digital channel for engagement
   # Strong correlation with wealthy, long-term donors
@@ -63,6 +74,13 @@ CHANNELS:
       "Credit Card": 0.70
       "Bank Transfer": 0.20
       "PayPal": 0.10
+    # Regular donor configuration
+    regular_donor_rate: 1.0  # Channel-specific rate
+    regular_donor_monthly_avg: 25  # Average monthly donation amount
+    regular_donor_wealth_multiplier:
+      low: 0.6
+      medium: 1.2
+      high: 2.8
     campaigns:
       prospecting:
         nb: 12  # Regular newsletters and campaigns
@@ -79,36 +97,6 @@ CHANNELS:
         cross_sell:
           - ["Email", 0.70]  # 70% of existing Email contacts are targeted
           - ["Online", 0.50]  # Cross-sell to Online channel
-          - ["MonthlyGiving", 0.30]  # Convert to monthly giving
-  
-  # Monthly giving / recurring donations - Strong indicator of regular donors
-  # Wealthy donors are more likely to commit to monthly giving
-  MonthlyGiving:
-    distribution: "regular"
-    duration: 365  # Year-long commitment
-    initial_nb: 8000  # Initial monthly donors
-    cost_per_reach: 0.5
-    payment:
-      "Bank Transfer": 0.60  # Direct debit preferred for monthly
-      "Credit Card": 0.35
-      "PayPal": 0.05
-    campaigns:
-      prospecting:
-        nb: 6  # Campaigns to recruit new monthly donors
-        max_reach_contact: 80000
-        transformation_rate: 0.008  # Lower conversion but high value
-        avg_donation: 30  # Monthly amount (€20-40 range)
-        std_deviation: 12
-      retention:
-        nb: 18  # Regular campaigns to retain monthly donors
-        max_reach_contact: 35000
-        transformation_rate: 0.50  # Very high retention for monthly donors
-        avg_donation: 35  # Slightly higher for retained monthly donors
-        std_deviation: 15
-        cross_sell:
-          - ["MonthlyGiving", 0.80]  # Strong retention focus
-          - ["Online", 0.40]  # Cross-sell from Online
-          - ["Email", 0.50]   # Cross-sell from Email
   
   # Corporate events / CSR partnerships - Target wealthy donors
   CorporateEvents:
@@ -120,6 +108,13 @@ CHANNELS:
       "Bank Transfer": 0.50
       "Credit Card": 0.40
       "Check": 0.10
+    # Regular donor configuration
+    regular_donor_rate: 0.8  # Lower rate for corporate (one-time larger donations)
+    regular_donor_monthly_avg: 50  # Higher monthly amount for corporate
+    regular_donor_wealth_multiplier:
+      low: 0.4
+      medium: 1.0
+      high: 2.2
     campaigns:
       prospecting:
         nb: 4  # Corporate partnership events
@@ -148,6 +143,13 @@ CHANNELS:
       "Check": 0.50
       "Bank Transfer": 0.35
       "Credit Card": 0.15
+    # Regular donor configuration
+    regular_donor_rate: 0.9
+    regular_donor_monthly_avg: 20
+    regular_donor_wealth_multiplier:
+      low: 0.5
+      medium: 1.0
+      high: 2.2
     campaigns:
       prospecting:
         nb: 4
@@ -176,6 +178,13 @@ CHANNELS:
       "Credit Card": 0.75  # Fast payment preferred
       "Bank Transfer": 0.20
       "PayPal": 0.05
+    # Regular donor configuration
+    regular_donor_rate: 0.07
+    regular_donor_monthly_avg: 22
+    regular_donor_wealth_multiplier:
+      low: 0.4
+      medium: 0.9
+      high: 2.0
     campaigns:
       prospecting:
         nb: 6  # Emergency appeals throughout the year
@@ -204,6 +213,13 @@ CHANNELS:
       "Credit Card": 0.60
       "Bank Transfer": 0.30
       "Check": 0.10
+    # Regular donor configuration
+    regular_donor_rate: 0.07
+    regular_donor_monthly_avg: 20
+    regular_donor_wealth_multiplier:
+      low: 0.4
+      medium: 0.9
+      high: 2.0
     campaigns:
       prospecting:
         nb: 5  # Media partnership campaigns
@@ -224,12 +240,84 @@ CHANNELS:
 
 # Campaign themes - Based on Redd Barna's focus areas
 CAMPAIGN_THEMES:
-  - ["Children_education", 0.25]  # "Children learn & are safe"
-  - ["Children_protection", 0.25]  # "Children's rights are implemented"
-  - ["Emergency_relief", 0.20]  # Emergency humanitarian campaigns
-  - ["Child_healthcare", 0.15]  # Health and nutrition programs
-  - ["Child_safety", 0.10]  # Protection from violence and exploitation
-  - ["Education_access", 0.05]  # Access to quality education
+  Children_education:
+    weight: 0.25
+    campaign_names:
+      - "Rewrite the Future"
+      - "Every Child in Class"
+      - "Back to School, Forward to Hope"
+      - "Learning Without Limits"
+      - "Books for Every Childhood"
+      - "Future-Ready Kids"
+      - "School Safe & Strong"
+      - "Kids Learning First"
+      - "Education for a New Tomorrow"
+      - "From Play to Progress"
+  Children_protection:
+    weight: 0.25
+    campaign_names:
+      - "#EveryLastChild"
+      - "#TheInvisibles"
+      - "Protect Their Childhood"
+      - "Child Rights Now"
+      - "Stand Up for Children"
+      - "Invisible No More"
+      - "Safe Start, Strong Future"
+      - "Children Deserve Dignity"
+      - "Justice for Childhoods"
+      - "End Violence Against Children"
+  Emergency_relief:
+    weight: 0.20
+    campaign_names:
+      - "Children in Crisis: Act Now"
+      - "Emergency Response for Children"
+      - "Hope After the Storm"
+      - "Children First in Emergencies"
+      - "Crisis Relief for Childhoods"
+      - "Emergency Lifeline for Kids"
+      - "Safe Homes, Safe Hearts"
+      - "Rebuild Their Tomorrow"
+      - "Rapid Response for Children"
+      - "Together in Disaster"
+  Child_healthcare:
+    weight: 0.15
+    campaign_names:
+      - "No Child Born to Die"
+      - "Healthy Start for Every Child"
+      - "Nutrition & Growth"
+      - "Immunize & Protect Childhood"
+      - "Healthy Kids, Happy Lives"
+      - "Child Health First"
+      - "Growing Up Strong"
+      - "Care for Kids"
+      - "Protect Newborn Lives"
+      - "Well-being for Every Child"
+  Child_safety:
+    weight: 0.10
+    campaign_names:
+      - "Safe Childhood Initiative"
+      - "Stop Violence Against Children"
+      - "No Child for Sale"
+      - "Shield Their Innocence"
+      - "Safe Zones for Kids"
+      - "Every Child Protected"
+      - "Safe Childhood, Bright Future"
+      - "Children Without Fear"
+      - "Protect • Support • Empower"
+      - "Child Safety Now"
+  Education_access:
+    weight: 0.05
+    campaign_names:
+      - "Open Doors to Learning"
+      - "Education for All Children"
+      - "Access + Quality = Opportunity"
+      - "Every Child’s Right to Learn"
+      - "Bridges to School"
+      - "Learning Access Initiative"
+      - "No Child Left Out"
+      - "Equal Access, Equal Future"
+      - "Unlock Education for Every Child"
+      - "Learning Without Barriers"
 
 # Demographic settings
 SALUTATIONS:

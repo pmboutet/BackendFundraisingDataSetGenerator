@@ -27,19 +27,34 @@ fi
 
 # Step 1: Generate data
 echo "📊 Step 1: Generating data..."
+echo "   → Activating virtual environment..."
 source venv/bin/activate
-OUTPUT=$(python generate_demo_data_en.py 2>&1)
-EXIT_CODE=$?
+echo "   → Running data generation script (unbuffered output)..."
+echo ""
+
+# Use PYTHONUNBUFFERED to see logs in real-time
+export PYTHONUNBUFFERED=1
+
+# Create a temporary file to capture output while still showing it
+TEMP_OUTPUT=$(mktemp)
+trap "rm -f $TEMP_OUTPUT" EXIT
+
+# Run the script and tee output to both console and file
+python -u generate_demo_data_en.py 2>&1 | tee "$TEMP_OUTPUT"
+EXIT_CODE=${PIPESTATUS[0]}
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "❌ Error during data generation"
-    echo "$OUTPUT"
+    echo ""
+    echo "❌ Error during data generation (exit code: $EXIT_CODE)"
     exit 1
 fi
 
-# Extract timestamp from output - look for the pattern "📅 Timestamp: YYYYMMDD_HHMMSS"
-# Use sed instead of grep -P for macOS compatibility
-TIMESTAMP=$(echo "$OUTPUT" | grep "📅 Timestamp:" | sed -E 's/.*📅 Timestamp: ([0-9]{8}_[0-9]{6}).*/\1/' || echo "")
+echo ""
+echo "   ✓ Data generation completed"
+
+# Extract timestamp from output
+echo "   → Extracting timestamp..."
+TIMESTAMP=$(grep "📅 Timestamp:" "$TEMP_OUTPUT" | sed -E 's/.*folder: ([0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}).*/\1/' || echo "")
 
 # If not found, try to extract from the zip file path (most recent)
 if [ -z "$TIMESTAMP" ]; then
@@ -51,26 +66,41 @@ fi
 
 # If still not found, use the most recent directory in demo_output
 if [ -z "$TIMESTAMP" ]; then
-    TIMESTAMP=$(ls -t demo_output/ 2>/dev/null | grep -E '^[0-9]{8}_[0-9]{6}$' | head -1)
+    TIMESTAMP=$(ls -t demo_output/ 2>/dev/null | grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}$' | head -1)
 fi
 
+if [ -z "$TIMESTAMP" ]; then
+    echo "   ⚠ Warning: Could not extract timestamp, will use fallback"
+else
+    echo "   ✓ Timestamp extracted: $TIMESTAMP"
+fi
 echo ""
-echo "📅 Using timestamp: $TIMESTAMP"
 
 # Step 2: Analyze data
 echo "🔍 Step 2: Analyzing complex correlation..."
 if [ -n "$TIMESTAMP" ]; then
     ZIP_FILE="demo_output/$TIMESTAMP/demo_data_en_$TIMESTAMP.zip"
-    python demo_analysis_en.py "$ZIP_FILE" 3 "$TIMESTAMP"
+    echo "   → Using ZIP file: $ZIP_FILE"
+    if [ ! -f "$ZIP_FILE" ]; then
+        echo "   ⚠ Warning: ZIP file not found, trying symlink..."
+        ZIP_FILE="demo_data_en.zip"
+    fi
+    echo "   → Running analysis script..."
+    python -u demo_analysis_en.py "$ZIP_FILE" 3 "$TIMESTAMP"
 else
     # Fallback to symlink
-    python demo_analysis_en.py demo_data_en.zip
+    echo "   → Using fallback symlink: demo_data_en.zip"
+    echo "   → Running analysis script..."
+    python -u demo_analysis_en.py demo_data_en.zip
 fi
 
-if [ $? -ne 0 ]; then
-    echo "❌ Error during analysis"
+ANALYSIS_EXIT=$?
+if [ $ANALYSIS_EXIT -ne 0 ]; then
+    echo "❌ Error during analysis (exit code: $ANALYSIS_EXIT)"
     exit 1
 fi
+
+echo "   ✓ Analysis completed successfully"
 
 echo ""
 echo "✅ Demo completed successfully!"

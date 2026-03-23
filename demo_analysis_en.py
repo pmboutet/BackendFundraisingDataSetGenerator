@@ -125,8 +125,8 @@ def analyze_complex_correlation(transactions_df, contacts_df, min_donations=3):
         lambda x: 'High Wealth' if x >= 8 else ('Medium Wealth' if x >= 5 else 'Low Wealth')
     )
     
-    # Categorize channel (Digital = Online, Email, MonthlyGiving; Non-Digital = others)
-    digital_channels = ['Online', 'Email', 'MonthlyGiving']
+    # Categorize channel (Digital = Online, Email; Non-Digital = others)
+    digital_channels = ['Online', 'Email']
     analysis_df['channel_type'] = analysis_df['primary_channel'].apply(
         lambda x: 'Digital' if x in digital_channels else 'Non-Digital'
     )
@@ -445,6 +445,58 @@ def main():
     # Also save raw transactions in original format for backward compatibility
     transactions_df.to_csv(os.path.join(output_dir, 'transactions_raw.csv'), index=False)
     print(f"   ✓ Raw transactions saved to {output_dir}/transactions_raw.csv (original format)")
+    
+    # Create enriched CONTACT-level dataset for predictive AI
+    print("\n💾 Creating CONTACT-level dataset for predictive AI...")
+    
+    # Calculate additional metrics for contacts
+    contact_predictive_df = analysis_df.copy()
+    
+    # Add last donation date
+    last_donations = transactions_df.groupby('contact_id')['date'].max()
+    contact_predictive_df['last_donation'] = contact_predictive_df['contact_id'].map(last_donations)
+    
+    # Calculate days since last donation
+    current_date = pd.Timestamp(f'{datetime.now().year}-01-01')
+    contact_predictive_df['days_since_last_donation'] = (
+        current_date - pd.to_datetime(contact_predictive_df['last_donation'])
+    ).dt.days
+    
+    # Select relevant columns for predictive modeling
+    predictive_columns = [
+        # Identifier
+        'contact_id',
+        # Demographics
+        'salutation', 'gender', 'job', 'job_category',
+        # Wealth indicators
+        'origin_decile', 'wealth_category',
+        # Donation history (features)
+        'nb_donations', 'total_donated', 'avg_donation', 
+        'first_donation', 'last_donation', 'days_since_last_donation',
+        # Channel preferences
+        'primary_channel', 'channel_type',
+        # Longevity
+        'Creation_date', 'Creation_year', 'longevity_years', 'longevity_category',
+        'nb_donations_before_regular',
+        # Geographic (optional but can be useful)
+        'city', 'country', 'zip_code',
+        # Target variable (for supervised learning)
+        'is_regular'
+    ]
+    
+    # Create predictive dataset
+    contact_predictive_df = contact_predictive_df[predictive_columns].copy()
+    
+    # Save in Salesforce NPC format
+    contact_predictive_sf = export_to_salesforce_format(contact_predictive_df, data_type='analysis')
+    contact_predictive_sf.to_csv(os.path.join(output_dir, 'Contact_Predictive_Salesforce.csv'), index=False)
+    print(f"   ✓ Contact predictive dataset saved to {output_dir}/Contact_Predictive_Salesforce.csv (Salesforce NPC format)")
+    
+    # Save in original format
+    contact_predictive_df.to_csv(os.path.join(output_dir, 'Contact_Predictive.csv'), index=False)
+    print(f"   ✓ Contact predictive dataset saved to {output_dir}/Contact_Predictive.csv (original format)")
+    print(f"   • {len(contact_predictive_df):,} contacts with {len(predictive_columns)} features")
+    print(f"   • Target variable: is_regular ({contact_predictive_df['is_regular'].sum():,} regular donors)")
     
     print("\n✅ Analysis complete!")
 

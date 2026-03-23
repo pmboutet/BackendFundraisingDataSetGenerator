@@ -16,6 +16,7 @@ class ContactManager:
 
     def _initialize_contacts(self) -> None:
         """Initialize contacts for each channel with their initial numbers."""
+        import sys
         for channel, info in self.channels.items():
             initial_nb = info.get('initial_nb', 0)
             initial_contacts = [self._generate_unique_contact_id() for _ in range(initial_nb)]
@@ -24,6 +25,7 @@ class ContactManager:
             self.unused_contacts[channel] = initial_contacts.copy()
             
             print(f'Initialized {len(initial_contacts)} contacts for channel {channel}.')
+            sys.stdout.flush()
 
     def _generate_unique_contact_id(self) -> str:
         """Generate a unique contact ID.
@@ -117,6 +119,8 @@ class ContactManager:
             nb_sent = len(contacts_ids)
 
             print(f"Prospecting campaign in '{channel}': Reach = {nb_reach}, Sent = {nb_sent}")
+            import sys
+            sys.stdout.flush()
             return nb_reach, nb_sent, contacts_ids[:nb_sent]
 
         elif campaign_type == 'retention':
@@ -131,6 +135,8 @@ class ContactManager:
             nb_sent = int(nb_reach * transformation_rate)
 
             print(f"Retention campaign in '{channel}': Reach = {nb_reach}, Sent = {nb_sent}")
+            import sys
+            sys.stdout.flush()
             
             contact_ids = contacts_ids[:nb_sent]
             self.existing_contacts[channel] = list(
